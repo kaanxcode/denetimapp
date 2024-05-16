@@ -38,7 +38,7 @@ const Audit = () => {
   useEffect(() => {
     const questions = auditQuestions.split(",");
     setAuditQ(questions);
-  }, [route.params]);
+  }, [auditQuestions]);
 
   const saveQuestion = () => {
     setModalVisible(false);

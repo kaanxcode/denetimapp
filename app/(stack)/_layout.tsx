@@ -25,6 +25,10 @@ export default function Layout() {
         }}
       />
       <Stack.Screen name="camera" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="history-audit"
+        options={{ headerShown: true, headerTitle: "Geçmiş Denetiminiz" }}
+      />
     </Stack>
   );
 }

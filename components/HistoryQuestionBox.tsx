@@ -1,64 +1,16 @@
-import React, { useState, useEffect } from "react";
 import {
-  View,
-  Text,
-  Pressable,
   Modal,
-  TextInput,
-  TouchableOpacity,
+  Pressable,
   StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  TextInput,
 } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import { setQuestions } from "../redux/features/auditSlice"; // Slice'dan actionları import et
+import React, { useState } from "react";
 
-const QuestionBox = ({ question }) => {
-  const dispatch = useDispatch();
-  const [answer, setAnswer] = useState("");
-  const [noteText, setNoteText] = useState("");
+const HistoryQuestionBox = ({ question, answer, note }) => {
   const [modalVisible, setModalVisible] = useState(false);
-
-  const { questions } = useSelector((state) => state.audit);
-  //console.log("questions => QuestionBox.tsx", questions);
-  // console.log("auditName => QuestionBox.tsx", nameAudit);
-  // console.log("auditSector => QuestionBox.tsx", nameSector);
-
-  useEffect(() => {
-    const handleSave = () => {
-      // Mevcut sorunun indeksini bul
-      const existingQuestionIndex = questions.findIndex(
-        (q) => q.question === question
-      );
-
-      // Eğer aynı soru zaten varsa, sadece cevap ve notu güncelle
-      if (existingQuestionIndex !== -1) {
-        const updatedQuestions = [...questions];
-        const updatedQuestion = {
-          ...updatedQuestions[existingQuestionIndex],
-          answer: answer,
-          note: noteText,
-        };
-        updatedQuestions[existingQuestionIndex] = updatedQuestion;
-        dispatch(setQuestions(updatedQuestions));
-      } else {
-        if (answer) {
-          // Yeni bir soru ekle
-          const newQuestion = {
-            question: question,
-            answer: answer,
-            note: noteText,
-          };
-          dispatch(setQuestions([...questions, newQuestion]));
-        }
-      }
-    };
-
-    handleSave();
-  }, [answer, noteText]);
-
-  const handleAnswer = (value) => {
-    setAnswer(value);
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.questionContainer}>
@@ -72,7 +24,6 @@ const QuestionBox = ({ question }) => {
             styles.answerButton,
             answer === "Uygun" && { backgroundColor: "green" },
           ]}
-          onPress={() => handleAnswer("Uygun")}
         >
           <Text style={styles.answerButtonText}>Uygun</Text>
         </Pressable>
@@ -81,7 +32,6 @@ const QuestionBox = ({ question }) => {
             styles.answerButton,
             answer === "Uygun Değil" && { backgroundColor: "red" },
           ]}
-          onPress={() => handleAnswer("Uygun Değil")}
         >
           <Text style={styles.answerButtonText}>Uygun Değil</Text>
         </Pressable>
@@ -90,7 +40,6 @@ const QuestionBox = ({ question }) => {
             styles.answerButton,
             answer === "Uygulama Yok" && { backgroundColor: "grey" },
           ]}
-          onPress={() => handleAnswer("Uygulama Yok")}
         >
           <Text style={styles.answerButtonText}>Uygulama Yok</Text>
         </Pressable>
@@ -106,10 +55,11 @@ const QuestionBox = ({ question }) => {
         <Pressable
           style={styles.additionalButton}
           onPress={() => navigation.navigate("camera")}
+          disabled
         >
           <Text style={styles.additionalButtonText}>Görüntü Ekle</Text>
         </Pressable>
-        <Pressable style={styles.additionalButton}>
+        <Pressable disabled style={styles.additionalButton}>
           <Text style={styles.additionalButtonText}>Soruyu Sil</Text>
         </Pressable>
       </View>
@@ -126,19 +76,15 @@ const QuestionBox = ({ question }) => {
             <TextInput
               style={styles.input}
               placeholder="Notunuzu yazın..."
-              value={noteText}
-              onChangeText={(text) => setNoteText(text)}
+              value={note}
             />
             <View style={styles.buttonContainer}>
-              <TouchableOpacity onPress={() => setModalVisible(false)}>
+              <TouchableOpacity disabled onPress={() => setModalVisible(false)}>
                 <Text style={styles.saveText}>Kaydet</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
                   setModalVisible(false);
-                  if (!noteText) {
-                    setNoteText("");
-                  }
                 }}
               >
                 <Text style={styles.cancelText}>İptal</Text>
@@ -151,7 +97,7 @@ const QuestionBox = ({ question }) => {
   );
 };
 
-export default QuestionBox;
+export default HistoryQuestionBox;
 const styles = StyleSheet.create({
   container: {
     padding: 10,

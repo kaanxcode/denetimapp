@@ -19,7 +19,7 @@ const FormComponent = () => {
   const dispatch = useDispatch();
 
   const { infos } = useSelector((state) => state.audit);
-  console.log("infos => FormComponent.tsx", infos);
+  //console.log("infos => FormComponent.tsx", infos);
 
   // Tarih ve saat fonksiyonu
   function getFormattedDate() {
