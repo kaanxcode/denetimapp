@@ -20,7 +20,7 @@ const CameraScreen = () => {
   const [permission, requestPermission] = useCameraPermissions();
   const [permissionMedia, requestPermissionMedia] =
     MediaLibrary.usePermissions();
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState("");
   const [facing, setFacing] = useState("back");
   const [flash, setFlash] = useState("off");
   const cameraRef = useRef(null);
@@ -80,7 +80,7 @@ const CameraScreen = () => {
           <Image source={{ uri: image }} style={{ flex: 1 }} />
           <View style={styles.buttonContainer}>
             <TouchableOpacity
-              onPress={() => setImage(null)}
+              onPress={() => setImage("")}
               style={styles.button}
             >
               <Text style={styles.text}>Tekrar Çek</Text>

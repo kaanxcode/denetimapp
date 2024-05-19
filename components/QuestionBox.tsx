@@ -11,7 +11,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { setQuestions } from "../redux/features/auditSlice"; // Slice'dan actionları import et
 import { router } from "expo-router";
-import { setPhoto } from "@/redux/features/cameraSlice";
+import { clearPhoto, setPhoto } from "@/redux/features/cameraSlice";
 
 const QuestionBox = ({ question }) => {
   const dispatch = useDispatch();
@@ -45,7 +45,7 @@ const QuestionBox = ({ question }) => {
         };
         updatedQuestions[existingQuestionIndex] = updatedQuestion;
         dispatch(setQuestions(updatedQuestions));
-        dispatch(setPhoto());
+        dispatch(clearPhoto());
       } else {
         if (answer) {
           // Yeni bir soru ekle
@@ -56,7 +56,7 @@ const QuestionBox = ({ question }) => {
             image: photo,
           };
           dispatch(setQuestions([...questions, newQuestion]));
-          dispatch(setPhoto());
+          dispatch(clearPhoto());
         }
       }
     };

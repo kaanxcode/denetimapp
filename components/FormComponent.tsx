@@ -12,6 +12,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { setInfos, saveAndSend } from "../redux/features/auditSlice";
 import { router } from "expo-router";
+import { pdfGenerator } from "@/PdfGenerator/pdfGenerator";
 
 const FormComponent = () => {
   const [companyName, setCompanyName] = useState("");
@@ -43,6 +44,8 @@ const FormComponent = () => {
   const handlePressSend = async () => {
     try {
       await dispatch(saveAndSend());
+      const file = await pdfGenerator();
+      console.log("file", file);
       Alert.alert(
         "İŞLEM BAŞARILI!", // Alert başlığı
         "Denetim başarı ile Gönderildi", // Alert mesajı
