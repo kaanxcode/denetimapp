@@ -28,6 +28,7 @@ const Audit = () => {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const [auditQ, setAuditQ] = useState([]);
+  const [question, setQuestion] = useState("");
 
   useEffect(() => {
     // console.log("auditName => Audit.tsx", auditName);
@@ -36,14 +37,19 @@ const Audit = () => {
   }, [dispatch, auditName, auditSector]);
 
   useEffect(() => {
-    const questions = auditQuestions.split(",");
-    setAuditQ(questions);
+    if (auditQuestions) {
+      const questions = auditQuestions.split(",");
+      setAuditQ(questions);
+    }
   }, [auditQuestions]);
 
   const saveQuestion = () => {
-    setModalVisible(false);
+    setAuditQ([...auditQ, question]);
+    setModalVisible(!modalVisible);
+    setQuestion("");
   };
 
+  // sayfadan çıkıldığında redux state'i sıfırlar
   useEffect(() => {
     const unsubscribe = navigation.addListener("beforeRemove", () => {
       // Geri gidildiğinde sıfırlama işlemini gerçekleştir
@@ -51,7 +57,7 @@ const Audit = () => {
     });
 
     return unsubscribe;
-  }, [navigation]); // useEffect, navigation değiştiğinde tetiklenecek
+  }, [navigation]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -86,7 +92,12 @@ const Audit = () => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <TextInput style={styles.input} placeholder="Soru Yazın" />
+            <TextInput
+              style={styles.input}
+              placeholder="Soru Yazın"
+              value={question}
+              onChangeText={setQuestion}
+            />
             <View style={styles.buttonContainer}>
               <TouchableOpacity onPress={saveQuestion}>
                 <Text style={styles.saveText}>Kaydet</Text>

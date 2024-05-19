@@ -11,9 +11,12 @@ import { useCameraPermissions, CameraView } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "expo-router";
+import { setPhoto } from "@/redux/features/cameraSlice";
+import { useDispatch } from "react-redux";
 
 const CameraScreen = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   const [permission, requestPermission] = useCameraPermissions();
   const [permissionMedia, requestPermissionMedia] =
     MediaLibrary.usePermissions();
@@ -35,11 +38,16 @@ const CameraScreen = () => {
   if (!permission.granted) {
     // Camera permissions are not granted yet.
     return (
-      <View style={styles.container}>
-        <Text style={{ textAlign: "center" }}>
-          Lütfen Kamera ve Medya izinlerini verin
+      <View style={styles.containerPermission}>
+        <Text style={styles.textPermission}>
+          Görüntü ekleyebilmeniz için butona basarak izinleri vermeniz
+          gerekmektedir.
         </Text>
-        <Button onPress={requestPermissionAll} title="grant permission" />
+        <Button
+          color="#7EBDC2"
+          onPress={requestPermissionAll}
+          title="Kamera Kullanımına İzİn Ver"
+        />
       </View>
     );
   }
@@ -80,17 +88,13 @@ const CameraScreen = () => {
             <TouchableOpacity
               onPress={() => {
                 if (image) {
-                  MediaLibrary.saveToLibraryAsync(image)
-                    .then(() => {
-                      console.log("Image saved successfully");
-                      navigation.goBack();
-                    })
-
-                    .catch((error) => {
-                      console.error("Error saving image:", error);
-                    });
-                } else {
-                  console.warn("No image to save");
+                  try {
+                    dispatch(setPhoto(image));
+                    console.log("Image saved successfully");
+                    navigation.goBack();
+                  } catch (error) {
+                    console.log("Error saving image", error);
+                  }
                 }
               }}
               style={styles.button}
@@ -136,5 +140,17 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 20,
     color: "#fff",
+  },
+  containerPermission: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    padding: 20,
+  },
+  textPermission: {
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 20,
   },
 });

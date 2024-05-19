@@ -40,6 +40,8 @@ export const login = createAsyncThunk(
       // Eğer kullanıcı başarıyla login yaptıysa gelen onay Token cihazın local hafızasına kaydet
 
       await AsyncStorage.setItem("userToken", token);
+      await AsyncStorage.setItem("userUid", user.uid);
+      await AsyncStorage.setItem("userEmail", user.email);
 
       return userData;
     } catch (error) {
@@ -94,6 +96,8 @@ export const logout = createAsyncThunk("user/logout", async () => {
 
     // Telefonun ön belleğinde tutulan 'token' verisini sil
     await AsyncStorage.removeItem("userToken");
+    await AsyncStorage.removeItem("userUid");
+    await AsyncStorage.removeItem("userEmail");
 
     await router.replace("/");
 
@@ -126,6 +130,8 @@ export const register = createAsyncThunk(
 
       // Kayıt sonrası kullanıcı başarıyla uygulamaya giriş yapacağı için alınan token telefonun önbelleğine kaydedilir
       await AsyncStorage.setItem("userToken", token);
+      await AsyncStorage.setItem("userUid", user.uid);
+      await AsyncStorage.setItem("userEmail", user.email);
 
       return token;
     } catch (error) {

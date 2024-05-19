@@ -10,6 +10,8 @@ import {
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { setQuestions } from "../redux/features/auditSlice"; // Slice'dan actionları import et
+import { router } from "expo-router";
+import { setPhoto } from "@/redux/features/cameraSlice";
 
 const QuestionBox = ({ question }) => {
   const dispatch = useDispatch();
@@ -18,9 +20,12 @@ const QuestionBox = ({ question }) => {
   const [modalVisible, setModalVisible] = useState(false);
 
   const { questions } = useSelector((state) => state.audit);
-  //console.log("questions => QuestionBox.tsx", questions);
-  // console.log("auditName => QuestionBox.tsx", nameAudit);
-  // console.log("auditSector => QuestionBox.tsx", nameSector);
+  const { photo } = useSelector((state) => state.camera);
+  console.log("photo => QuestionBox.tsx", photo);
+  console.log("questions => QuestionBox.tsx", questions);
+
+  console.log("answer => QuestionBox.tsx", answer);
+  console.log("noteText => QuestionBox.tsx", noteText);
 
   useEffect(() => {
     const handleSave = () => {
@@ -36,9 +41,11 @@ const QuestionBox = ({ question }) => {
           ...updatedQuestions[existingQuestionIndex],
           answer: answer,
           note: noteText,
+          image: photo,
         };
         updatedQuestions[existingQuestionIndex] = updatedQuestion;
         dispatch(setQuestions(updatedQuestions));
+        dispatch(setPhoto());
       } else {
         if (answer) {
           // Yeni bir soru ekle
@@ -46,8 +53,10 @@ const QuestionBox = ({ question }) => {
             question: question,
             answer: answer,
             note: noteText,
+            image: photo,
           };
           dispatch(setQuestions([...questions, newQuestion]));
+          dispatch(setPhoto());
         }
       }
     };
@@ -105,7 +114,7 @@ const QuestionBox = ({ question }) => {
         </Pressable>
         <Pressable
           style={styles.additionalButton}
-          onPress={() => navigation.navigate("camera")}
+          onPress={() => router.push("camera")}
         >
           <Text style={styles.additionalButtonText}>Görüntü Ekle</Text>
         </Pressable>

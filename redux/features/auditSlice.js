@@ -2,16 +2,24 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { db } from "../../firebaseConfig";
 import { addDoc, collection } from "firebase/firestore";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 export const saveAndSend = createAsyncThunk(
   "audit/saveAndSend",
   async (_, { getState, dispatch }) => {
     try {
       const { audit } = getState();
+      const userUid = await AsyncStorage.getItem("userUid");
+      const userEmail = await AsyncStorage.getItem("userEmail");
+      console.log("userUid", userUid, "userEmail", userEmail);
+
       const docRef = await addDoc(collection(db, "auditsHistory"), {
         nameAudit: audit.nameAudit,
         nameSector: audit.nameSector,
         questions: audit.questions,
         infos: audit.infos,
+        userUid: userUid,
+        userEmail: userEmail,
       });
       dispatch(setQuestions([]));
       dispatch(setInfos([]));

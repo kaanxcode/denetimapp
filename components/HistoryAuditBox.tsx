@@ -1,11 +1,12 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 import React from "react";
 
 import { FontAwesome6 } from "@expo/vector-icons";
 import { router, useNavigation } from "expo-router";
+import deleteDocument from "@/api/deleteHistory";
 
 const HistoryAuditBox = ({ historyAuditData }) => {
-  //console.log("historyAuditData => HistoryAuditBox.tsx", historyAuditData);
+  console.log("historyAuditData => HistoryAuditBox.tsx", historyAuditData);
   const navigation = useNavigation();
   const handlePress = () => {
     navigation.navigate("(stack)", {
@@ -17,6 +18,40 @@ const HistoryAuditBox = ({ historyAuditData }) => {
     });
   };
 
+  const handleLongPress = () => {
+    Alert.alert(
+      "Silme İşlemi",
+      "Bu denetimi geçmişinizden silmek istediğinize emin misiniz?",
+      [
+        {
+          text: "Evet",
+          onPress: () => {
+            deleteDocument("auditsHistory", historyAuditData.id).then(() => {
+              Alert.alert(
+                "Silme İşlemi Başarılı!",
+                "Lütfen Sayfayı Yenileyin",
+                [
+                  {
+                    text: "Tamam",
+                    onPress: () => {},
+                  },
+                ]
+              );
+            });
+
+            //console.log(historyAuditData.id);
+          },
+        },
+        {
+          text: "Hayır",
+          onPress: () => {
+            console.log("Silme işlemi iptal edildi");
+          },
+        },
+      ]
+    );
+  };
+
   // console.log(
   //   "question => HistoryAuditBox.tsx",
   //   historyAuditData.questions.map((q) => ({
@@ -26,7 +61,11 @@ const HistoryAuditBox = ({ historyAuditData }) => {
   //   }))
   // );
   return (
-    <Pressable style={styles.container} onPress={handlePress}>
+    <Pressable
+      style={styles.container}
+      onPress={handlePress}
+      onLongPress={handleLongPress}
+    >
       <View style={styles.iconContainer}>
         <FontAwesome6 name="file-pen" size={24} color="red" />
       </View>

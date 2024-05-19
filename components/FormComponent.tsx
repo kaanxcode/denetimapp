@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
+  Button,
+  Modal,
   StyleSheet,
   Text,
   TextInput,
@@ -8,6 +11,7 @@ import {
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { setInfos, saveAndSend } from "../redux/features/auditSlice";
+import { router } from "expo-router";
 
 const FormComponent = () => {
   const [companyName, setCompanyName] = useState("");
@@ -16,9 +20,12 @@ const FormComponent = () => {
   const [inspectionDate, setInspectionDate] = useState(getFormattedDate());
   const [generalNotes, setGeneralNotes] = useState("");
   const [emailRecipients, setEmailRecipients] = useState("");
+  const [isButtonEnabled, setIsButtonEnabled] = useState(false);
+
   const dispatch = useDispatch();
 
   const { infos } = useSelector((state) => state.audit);
+
   //console.log("infos => FormComponent.tsx", infos);
 
   // Tarih ve saat fonksiyonu
@@ -33,8 +40,28 @@ const FormComponent = () => {
     return formattedDate;
   }
 
-  const handlePressSend = () => {
-    dispatch(saveAndSend());
+  const handlePressSend = async () => {
+    try {
+      await dispatch(saveAndSend());
+      Alert.alert(
+        "İŞLEM BAŞARILI!", // Alert başlığı
+        "Denetim başarı ile Gönderildi", // Alert mesajı
+        [
+          {
+            text: "Ana Sayfaya Dön", // Buton metni
+            onPress: () => router.back(),
+          },
+          {
+            text: "Geçmiş Denetimler", // Buton metni
+            onPress: () => router.replace("History"), // 'LoginScreen' yerine giriş yap ekranınızın rotasını yazın
+          },
+        ],
+        { cancelable: false }
+      );
+    } catch (error) {
+      console.error("Error sending data:", error);
+      Alert.alert("Error", "Something went wrong.");
+    }
   };
 
   useEffect(() => {
@@ -59,33 +86,58 @@ const FormComponent = () => {
     emailRecipients,
   ]);
 
+  // form kontol alanı
+  const isFormFilled = () => {
+    return (
+      companyName !== "" &&
+      location !== "" &&
+      inspector !== "" &&
+      inspectionDate !== "" &&
+      emailRecipients !== ""
+    );
+  };
+  const handleInputChange = () => {
+    const isFormFilledCompletely = isFormFilled();
+    setIsButtonEnabled(isFormFilledCompletely);
+  };
+  useEffect(() => {
+    handleInputChange();
+  }, [
+    companyName,
+    location,
+    inspector,
+    inspectionDate,
+    emailRecipients,
+    generalNotes,
+  ]);
+
   return (
     <View style={styles.container}>
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
-          placeholder="Firma Adı Giriniz..."
+          placeholder="*Firma Adı Giriniz..."
           placeholderTextColor="#7EBDC2"
           value={companyName}
           onChangeText={setCompanyName}
         />
         <TextInput
           style={styles.input}
-          placeholder="Lokasyon \ Bölge Giriniz..."
+          placeholder="*Lokasyon \ Bölge Giriniz..."
           placeholderTextColor="#7EBDC2"
           value={location}
           onChangeText={setLocation}
         />
         <TextInput
           style={styles.input}
-          placeholder="Denetleyen Kişi Giriniz..."
+          placeholder="*Denetleyen Kişi Giriniz..."
           placeholderTextColor="#7EBDC2"
           value={inspector}
           onChangeText={setInspector}
         />
         <TextInput
           style={styles.input}
-          placeholder="Denetleme Tarihi Giriniz... (GG/AA/YYYY SS:DD)"
+          placeholder="*Denetleme Tarihi Giriniz... (GG/AA/YYYY SS:DD)"
           placeholderTextColor="#7EBDC2"
           value={inspectionDate}
           onChangeText={setInspectionDate}
@@ -102,14 +154,19 @@ const FormComponent = () => {
           keyboardType="email-address"
           inputMode="email"
           autoCapitalize="none"
-          placeholder="E-Posta Alıcılarını Giriniz..."
+          placeholder="*E-Posta Alıcılarını Giriniz..."
           placeholderTextColor="#7EBDC2"
           value={emailRecipients}
           onChangeText={setEmailRecipients}
         />
+        <Text style={styles.textRequiredFiled}>* Zorunlu Alanlar</Text>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={handlePressSend}>
+        <TouchableOpacity
+          disabled={!isButtonEnabled}
+          style={[styles.button, !isButtonEnabled && styles.buttonDisabled]}
+          onPress={handlePressSend}
+        >
           <Text style={styles.buttonText}>Kaydet Ve Gönder</Text>
         </TouchableOpacity>
       </View>
@@ -132,6 +189,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     alignItems: "center",
+    marginBottom: 10,
   },
   input: {
     padding: 10,
@@ -141,12 +199,19 @@ const styles = StyleSheet.create({
     backgroundColor: "#F5F5F5",
   },
   button: {
-    padding: 10,
+    padding: 15,
     backgroundColor: "#7EBDC2",
     borderRadius: 5,
   },
   buttonText: {
     color: "#fff",
     textAlign: "center",
+  },
+  buttonDisabled: {
+    backgroundColor: "#ccc",
+  },
+  textRequiredFiled: {
+    color: "red",
+    fontSize: 12,
   },
 });

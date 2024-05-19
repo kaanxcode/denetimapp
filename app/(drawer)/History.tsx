@@ -1,10 +1,24 @@
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  View,
+  RefreshControl,
+  ScrollView,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import HistoryAuditBox from "@/components/HistoryAuditBox";
 import getHistory from "@/api/getHistory";
 
 const History = () => {
   const [historyAuditData, setHistoryAuditData] = useState([]);
+  const [refreshing, setRefreshing] = React.useState(false);
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
 
   useEffect(() => {
     const fetchAuditsHistory = async () => {
@@ -18,7 +32,7 @@ const History = () => {
     };
 
     fetchAuditsHistory();
-  }, []);
+  }, [refreshing]);
 
   return (
     <View style={styles.container}>
@@ -26,6 +40,9 @@ const History = () => {
         data={historyAuditData}
         keyExtractor={(item, index) => index.toString()} // Her öğenin benzersiz bir key'e ihtiyacı olduğunu belirtmek için index'i kullanın
         renderItem={({ item }) => <HistoryAuditBox historyAuditData={item} />} // Her bir öğe için AuditBox bileşenini oluşturun
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       />
     </View>
   );
