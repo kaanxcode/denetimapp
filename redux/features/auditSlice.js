@@ -39,6 +39,7 @@ export const auditSlice = createSlice({
     nameSector: null,
     questions: [],
     infos: [],
+    trigger: false,
   },
   reducers: {
     setQuestions: (state, action) => {
@@ -57,6 +58,18 @@ export const auditSlice = createSlice({
       state.questions = [];
       state.infos = [];
     },
+    addPhotoToQuestion(state, action) {
+      const { question, photo } = action.payload;
+      const questionIndex = state.questions.findIndex(
+        (q) => q.question === question
+      );
+      if (questionIndex !== -1) {
+        state.questions[questionIndex].image = photo;
+      }
+    },
+    setTriger: (state, action) => {
+      state.trigger = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(saveAndSend.fulfilled, (state) => {
@@ -69,7 +82,13 @@ export const auditSlice = createSlice({
   },
 });
 
-export const { setQuestions, setInfos, setAuditInfo, setInitialState } =
-  auditSlice.actions;
+export const {
+  setQuestions,
+  setInfos,
+  setAuditInfo,
+  setInitialState,
+  addPhotoToQuestion,
+  setTriger,
+} = auditSlice.actions;
 
 export default auditSlice.reducer;

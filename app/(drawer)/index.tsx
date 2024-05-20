@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import SearchBarContent from "@/components/SearchBarComponent";
 import AuditBox from "@/components/AuditBox";
@@ -14,12 +14,16 @@ const Home = () => {
   const [auditData, setAuditData] = useState([]);
   const [userAuditData, setUserAuditData] = useState();
   const [fetch, setFetch] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const { trigger } = useSelector((state) => state.audit);
 
   const reoloadFetch = (value) => {
     setFetch(value);
   };
 
   useEffect(() => {
+    setLoading(true);
     const fetchData = async () => {
       const querySnapshot = await getDocs(collection(db, "audits"));
       const data = [];
@@ -30,6 +34,9 @@ const Home = () => {
     };
 
     fetchData();
+    if (auditData) {
+      setLoading(false);
+    }
   }, []);
 
   const segments = useSegments();
@@ -46,13 +53,20 @@ const Home = () => {
     };
     fetchData();
     setFetch(false);
-  }, [segments, fetch]);
+  }, [segments, fetch, trigger]);
 
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="small" color="#000" />
+      </View>
+    );
+  }
   return (
     <View style={styles.container}>
-      <View style={styles.searchBarContainer}>
+      {/* <View style={styles.searchBarContainer}>
         <SearchBarContent />
-      </View>
+      </View> */}
       <View style={styles.contentContainer}>
         <FlatList
           data={auditData}

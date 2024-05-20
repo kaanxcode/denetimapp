@@ -9,26 +9,43 @@ import {
   TextInput,
   FlatList,
   ScrollView,
+  RefreshControl,
+  Alert,
 } from "react-native";
 import { Link, router, useLocalSearchParams, useNavigation } from "expo-router";
 import QuestionBox from "@/components/QuestionBox";
 import FormComponent from "@/components/FormComponent";
 import { Ionicons } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
-import { setAuditInfo, setInitialState } from "@/redux/features/auditSlice";
-import { useDispatch } from "react-redux";
+import {
+  setAuditInfo,
+  setInitialState,
+  setTriger,
+} from "@/redux/features/auditSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { db } from "@/firebaseConfig";
+import {
+  collection,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 
 const Audit = () => {
   const dispatch = useDispatch();
   const route = useRoute();
-  const { auditName, auditQuestions, auditSector } = route.params;
-
+  const { auditName, auditQuestions, auditSector, documentId, userEmail } =
+    route.params;
   // console.log("auditQuestions => Audit.tsx", auditQuestions);
+  const [refreshing, setRefreshing] = useState(false);
+  const { trigger } = useSelector((state) => state.audit);
 
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const [auditQ, setAuditQ] = useState([]);
   const [question, setQuestion] = useState("");
+  const [isDelete, setIsDelete] = useState(false);
 
   useEffect(() => {
     // console.log("auditName => Audit.tsx", auditName);
@@ -43,10 +60,64 @@ const Audit = () => {
     }
   }, [auditQuestions]);
 
-  const saveQuestion = () => {
-    setAuditQ([...auditQ, question]);
-    setModalVisible(!modalVisible);
-    setQuestion("");
+  const saveQuestion = async () => {
+    try {
+      // Belirli bir audit sektörü ile eşleşen belgeyi al
+      const querySnapshot = await getDocs(
+        query(
+          collection(db, "usersAudits"),
+          where("auditSector", "==", auditSector)
+        )
+      );
+      //console.log("querySnapshot => Audit.tsx", querySnapshot);
+
+      // Belirli bir audit sektörü ile eşleşen her bir belgeyi işle
+      querySnapshot.forEach(async (doc) => {
+        try {
+          // Belgenin verilerini kontrol et
+          if (!doc.exists) {
+            console.error("Belge bulunamadı.");
+            return;
+          }
+
+          // Bulunan belgenin ID'sini al
+          const docId = doc.id;
+          //console.log("docId => Audit.tsx", docId);
+
+          // Belgenin içindeki questions dizisine doğrudan yeni soruyu ekle
+          await updateDoc(doc.ref, {
+            questions: [
+              ...(doc.data().questions || []), // Eğer questions dizisi yoksa, boş bir dizi oluştur
+              { question: question }, // Yeni soruyu ekleyelim
+            ],
+          });
+
+          //console.log(question, "Soru eklendi.");
+          if (trigger) {
+            dispatch(setTriger(false));
+          } else {
+            dispatch(setTriger(true));
+          }
+          console.log("Sorular başarıyla eklendi.");
+          Alert.alert("Başarılı!", "Sorular başarıyla eklendi.", [
+            {
+              text: "Tamam",
+              onPress: () => {
+                router.back();
+              },
+            },
+          ]);
+        } catch (updateError) {
+          console.error("Belge güncellenirken hata oluştu: ", updateError);
+        }
+      });
+
+      setModalVisible(!modalVisible);
+      setQuestion("");
+      console.log("Modal görünürlüğü değiştirildi ve soru sıfırlandı.");
+    } catch (error) {
+      console.error("Sorular eklenirken hata oluştu: ", error);
+    }
   };
 
   // sayfadan çıkıldığında redux state'i sıfırlar
@@ -76,7 +147,9 @@ const Audit = () => {
         scrollEnabled={false}
         data={auditQ}
         keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => <QuestionBox question={item} />}
+        renderItem={({ item }) => (
+          <QuestionBox question={item} documentId={documentId} />
+        )}
       />
 
       <FormComponent />

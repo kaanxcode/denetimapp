@@ -7,13 +7,15 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { setQuestions } from "../redux/features/auditSlice"; // Slice'dan actionları import et
 import { router } from "expo-router";
 import { clearPhoto, setPhoto } from "@/redux/features/cameraSlice";
+import deleteQuestion from "@/api/deleteQuestion";
 
-const QuestionBox = ({ question }) => {
+const QuestionBox = ({ question, documentId }) => {
   const dispatch = useDispatch();
   const [answer, setAnswer] = useState("");
   const [noteText, setNoteText] = useState("");
@@ -21,51 +23,79 @@ const QuestionBox = ({ question }) => {
 
   const { questions } = useSelector((state) => state.audit);
   const { photo } = useSelector((state) => state.camera);
-  console.log("photo => QuestionBox.tsx", photo);
-  console.log("questions => QuestionBox.tsx", questions);
-
-  console.log("answer => QuestionBox.tsx", answer);
-  console.log("noteText => QuestionBox.tsx", noteText);
+  // useEffect(() => {
+  //   console.log("photo => QuestionBox.tsx", photo);
+  //   console.log("questions=> QuestionBox.tsx", question);
+  //   console.log("answer => QuestionBox.tsx", answer);
+  //   console.log("noteText => QuestionBox.tsx", noteText);
+  //   console.log("questions => QuestionBox.tsx", questions);
+  // }, [photo, question, answer, noteText, questions]);
 
   useEffect(() => {
     const handleSave = () => {
-      // Mevcut sorunun indeksini bul
       const existingQuestionIndex = questions.findIndex(
         (q) => q.question === question
       );
 
-      // Eğer aynı soru zaten varsa, sadece cevap ve notu güncelle
       if (existingQuestionIndex !== -1) {
         const updatedQuestions = [...questions];
         const updatedQuestion = {
           ...updatedQuestions[existingQuestionIndex],
           answer: answer,
           note: noteText,
-          image: photo,
         };
+        if (photo) {
+          updatedQuestion.image = photo;
+        }
         updatedQuestions[existingQuestionIndex] = updatedQuestion;
         dispatch(setQuestions(updatedQuestions));
-        dispatch(clearPhoto());
+        if (photo) {
+          dispatch(clearPhoto());
+        }
       } else {
         if (answer) {
-          // Yeni bir soru ekle
           const newQuestion = {
             question: question,
             answer: answer,
             note: noteText,
-            image: photo,
           };
+          if (photo) {
+            newQuestion.image = photo;
+          }
           dispatch(setQuestions([...questions, newQuestion]));
-          dispatch(clearPhoto());
+          if (photo) {
+            dispatch(clearPhoto());
+          }
         }
       }
     };
 
     handleSave();
-  }, [answer, noteText]);
+  }, [answer, noteText, photo]);
 
   const handleAnswer = (value) => {
     setAnswer(value);
+  };
+  const handleDelete = () => {
+    deleteQuestion("usersAudits", documentId, question)
+      .then((success) => {
+        if (success) {
+          console.log("Soru başarıyla silindi.");
+          Alert.alert("Soru Silindi!", "Lütfen Tekrar Giriniz", [
+            {
+              text: "Tamam",
+              onPress: () => {
+                router.back(); // Burada router.push() ile geri dönelim
+              },
+            },
+          ]);
+        } else {
+          console.log("Soru silinemedi.");
+        }
+      })
+      .catch((error) => {
+        console.error("Hata:", error);
+      });
   };
 
   return (
@@ -114,11 +144,14 @@ const QuestionBox = ({ question }) => {
         </Pressable>
         <Pressable
           style={styles.additionalButton}
-          onPress={() => router.push("camera")}
+          onPress={() => {
+            router.push("camera");
+          }}
         >
           <Text style={styles.additionalButtonText}>Görüntü Ekle</Text>
         </Pressable>
-        <Pressable style={styles.additionalButton}>
+
+        <Pressable style={styles.additionalButton} onPress={handleDelete}>
           <Text style={styles.additionalButtonText}>Soruyu Sil</Text>
         </Pressable>
       </View>

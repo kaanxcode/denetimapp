@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setInfos, saveAndSend } from "../redux/features/auditSlice";
 import { router } from "expo-router";
 import { pdfGenerator } from "@/PdfGenerator/pdfGenerator";
+import { sendMail } from "@/api/sendMail";
 
 const FormComponent = () => {
   const [companyName, setCompanyName] = useState("");
@@ -25,7 +26,8 @@ const FormComponent = () => {
 
   const dispatch = useDispatch();
 
-  const { infos } = useSelector((state) => state.audit);
+  const audit = useSelector((state) => state.audit);
+  //console.log("audit => FormComponent.tsx", audit);
 
   //console.log("infos => FormComponent.tsx", infos);
 
@@ -44,7 +46,14 @@ const FormComponent = () => {
   const handlePressSend = async () => {
     try {
       await dispatch(saveAndSend());
-      const file = await pdfGenerator();
+      const file = await pdfGenerator(audit);
+      sendMail({ file, recipients: emailRecipients })
+        .then(() => {
+          console.log("Email function executed");
+        })
+        .catch((error) => {
+          console.error("Error executing email function:", error);
+        });
       console.log("file", file);
       Alert.alert(
         "İŞLEM BAŞARILI!", // Alert başlığı

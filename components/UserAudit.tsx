@@ -16,11 +16,15 @@ import deleteDocument from "@/api/deleteHistory";
 const UserAudit = ({ userAuditData, onValueChange }) => {
   console.log("userAuditData => UserAudit.tsx", userAuditData);
   const handlePress = () => {
+    const questions = userAuditData.questions || [];
     router.push({
       pathname: "[Audit]",
       params: {
         auditName: userAuditData.auditName,
         auditSector: userAuditData.auditSector,
+
+        auditQuestions: questions.map((question) => question.question),
+        documentId: userAuditData.id,
       },
     });
   };

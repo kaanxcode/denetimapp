@@ -29,7 +29,7 @@ const getUserAudits = async () => {
         ...doc.data(),
       });
     });
-
+    console.log("userAudits => getHistory.tsx", userAudits);
     return userAudits;
   } catch (error) {
     console.error("Error getting audits history: ", error);

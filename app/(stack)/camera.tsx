@@ -55,7 +55,11 @@ const CameraScreen = () => {
   const takePicture = async () => {
     if (cameraRef) {
       try {
-        let data = await cameraRef.current.takePictureAsync();
+        const options = {
+          quality: 0.2, // Fotoğraf kalitesini %50'ye düşürme
+          base64: false, // base64 formatında istemiyorsanız false yapabilirsiniz
+        };
+        let data = await cameraRef.current.takePictureAsync(options);
         console.log(data);
         setImage(data.uri);
       } catch (e) {
@@ -91,6 +95,7 @@ const CameraScreen = () => {
                   try {
                     dispatch(setPhoto(image));
                     console.log("Image saved successfully");
+                    setImage("");
                     navigation.goBack();
                   } catch (error) {
                     console.log("Error saving image", error);
