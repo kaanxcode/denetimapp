@@ -1,7 +1,7 @@
 import { StyleSheet, View, FlatList, ScrollView } from "react-native";
 import React from "react";
 import HistoryQuestionBox from "@/components/HistoryQuestionBox";
-import { useRouter } from "expo-router";
+
 import { useRoute } from "@react-navigation/native";
 import HistoryFormComponent from "@/components/HistoryFormComponent";
 

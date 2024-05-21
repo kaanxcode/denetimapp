@@ -2,7 +2,7 @@
   "expo": {
     "name": "DNX-İSG",
     "slug": "denetimapp",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -20,14 +20,16 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.kaanxcode.denetimapp"
+      "package": "com.kaanxcode.dnx-isg"
     },
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/adaptive-icon.png"
     },
-    "plugins": ["expo-router"],
+    "plugins": [
+      "expo-router"
+    ],
     "experiments": {
       "typedRoutes": true
     },
@@ -38,6 +40,7 @@
       "eas": {
         "projectId": "cafd6c39-3aa9-4361-977a-548a02608724"
       }
-    }
+    },
+    "owner": "kaanxcode"
   }
 }

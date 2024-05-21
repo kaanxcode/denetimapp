@@ -91,6 +91,15 @@ const QuestionBox = ({ question, documentId }) => {
           ]);
         } else {
           console.log("Soru silinemedi.");
+          Alert.alert(
+            "Sistem tarafından var olan sorular silinemez!",
+            "Bu soru sistem tarafından eklenmiş bir sorudur. Lütfen sistem yöneticinizle iletişime geçiniz.",
+            [
+              {
+                text: "Tamam",
+              },
+            ]
+          );
         }
       })
       .catch((error) => {

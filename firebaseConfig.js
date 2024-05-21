@@ -4,12 +4,12 @@ import { getReactNativePersistence, initializeAuth } from "firebase/auth";
 import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBD_K2dzRUi6ik4FYfQ0tHFJCcF5X2lnKY",
-  authDomain: "denetim-app.firebaseapp.com",
-  projectId: "denetim-app",
-  storageBucket: "denetim-app.appspot.com",
-  messagingSenderId: "167545998012",
-  appId: "1:167545998012:web:bf9e8a29408334b6bc1eb9",
+  apiKey: "AIzaSyC1qrhmUaClar79v5o3p4rKfyEStN0NHpg",
+  authDomain: "dnx-igs.firebaseapp.com",
+  projectId: "dnx-igs",
+  storageBucket: "dnx-igs.appspot.com",
+  messagingSenderId: "742240978332",
+  appId: "1:742240978332:web:8eeab1515bd5eafb203459",
 };
 
 const app = initializeApp(firebaseConfig);

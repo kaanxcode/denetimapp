@@ -78,7 +78,7 @@ const Login = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.imageContainer}>
         <Image
-          source={require("../assets/images/react-logo.png")}
+          source={require("../assets/images/drawer-logo.png")}
           style={styles.image}
         />
       </View>
