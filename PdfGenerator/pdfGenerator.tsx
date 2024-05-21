@@ -1,7 +1,7 @@
 import * as Print from "expo-print";
 import { shareAsync } from "expo-sharing";
 import * as FileSystem from "expo-file-system";
-import sendEmail from "@/api/emailjs";
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const getDateTimeString = () => {

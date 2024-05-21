@@ -1,6 +1,5 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 import React from "react";
-import { TextInput } from "react-native-gesture-handler";
 
 const SearchBarContent = () => {
   return (
